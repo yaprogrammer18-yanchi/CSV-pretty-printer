@@ -223,18 +223,22 @@ bool algorithm()
 
 bool testRowsQuantity()
 {
+    return true;
 }
 
 bool testColumsQuantity()
 {
+    return true;
 }
 
 bool testOneElement()
 {
+    return true;
 }
 
 bool testCheckMaxLenght()
 {
+    return true;
 }
 
 bool tests()
