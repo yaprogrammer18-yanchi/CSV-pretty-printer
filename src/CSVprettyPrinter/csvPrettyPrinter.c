@@ -13,9 +13,9 @@
 отсутствие пустых яеек (,,) в заголовках
 */
 
-int readFile(char** data)
+int readFile(char** data, const char* filepath)
 {
-    FILE* file = fopen("src/CSVprettyPrinter/input.csv", "r");
+    FILE* file = fopen(filepath, "r");
     if (file == NULL) {
         printf("file not found!\n");
         return false;
@@ -24,13 +24,11 @@ int readFile(char** data)
     char temporaryBuffer[256] = { 0 };
     while ((linesRead < 100) && (fgets(temporaryBuffer, sizeof(temporaryBuffer), file) != NULL)) {
         size_t indexOfLineBreak = strcspn(temporaryBuffer, "\n");
-
         if (indexOfLineBreak < sizeof(temporaryBuffer)) {
             temporaryBuffer[indexOfLineBreak] = '\0';
         } else {
             temporaryBuffer[sizeof(temporaryBuffer) - 1] = '\0'; // Безопасное значение
         }
-
         char* buffer = malloc(strlen(temporaryBuffer) + 1);
         if (buffer == NULL) {
             printf("Ошибка выделения памяти!\n");
@@ -47,6 +45,10 @@ int readFile(char** data)
 int quantityOfCols(char** data)
 {
     int columsQuantity = 0;
+    if (data[0] == 0) {
+        return columsQuantity;
+    }
+
     size_t len = strlen(data[0]);
     for (size_t i = 0; i < len; i++) {
         if (data[0][i] == ',') {
@@ -153,9 +155,9 @@ bool isNumber(const char* num)
     return false;
 }
 
-bool writeTableInFile(char** allWords, const int* maxLengths, int cols, int rows)
+bool writeTableInFile(char** allWords, const int* maxLengths, int cols, int rows, const char* filepath)
 {
-    FILE* out = fopen("src/CSVprettyPrinter/output.txt", "w");
+    FILE* out = fopen(filepath, "w");
     if (out == NULL) {
         return false;
     }
@@ -199,14 +201,15 @@ bool freeArrInArr(char** arr, int len)
 {
     for (int i = 0; i < len; i++) {
         free(arr[i]);
+        arr[i] = NULL;
     }
     return true;
 }
 
-bool algorithm(void)
+bool algorithm(const char* filepathInput, const char* filepathOutput)
 {
     char* data[100] = { 0 };
-    int rows = readFile(data);
+    int rows = readFile(data, filepathInput);
 
     if (rows <= 0) {
         printf("Ошибка\n");
@@ -242,42 +245,108 @@ bool algorithm(void)
     }
     getMaxLengthOfColInArr(allWords, cols, rows, maxLengthArr);
 
-    writeTableInFile(allWords, maxLengthArr, cols, rows);
+    writeTableInFile(allWords, maxLengthArr, cols, rows, filepathOutput);
     free(maxLengthArr);
     freeArrInArr(data, rows);
     freeArrInArr(allWords, words);
     free(allWords);
     return true;
 }
-/*
-bool testRowsQuantity()
+
+//--------------------------------tests---------------------------------------------------
+
+bool testRowsQuantity(void)
+{
+    printf("Проверка кол-ва строк...");
+    // 6 строк
+    char* data1[100] = { 0 };
+    int a1 = readFile(data1, "src/CSVprettyPrinter/testInput1.csv");
+    if (a1 != 6) {
+        freeArrInArr(data1, a1);
+        return false;
+    }
+
+    // 0 строк
+    char* data2[100] = { 0 };
+    int a2 = readFile(data2, "src/CSVprettyPrinter/testInput5.csv");
+    if (a2 != 0) {
+        freeArrInArr(data2, a2);
+        return false;
+    }
+
+    freeArrInArr(data2, a2);
+    freeArrInArr(data1, a1);
+    printf("завершена успешно\n");
+    return true;
+}
+
+bool testColumsQuantity(void)
+{
+    printf("Проверка кол-ва столбцов...");
+    // 5 столбцов
+    char* data1[100] = { 0 };
+    int a1 = readFile(data1, "src/CSVprettyPrinter/testInput1.csv");
+    int b1 = quantityOfCols(data1);
+    if (b1 != 5) {
+        freeArrInArr(data1, a1);
+        return false;
+    }
+
+    // 0 столбцов
+    char* data2[100] = { 0 };
+    int a2 = readFile(data2, "src/CSVprettyPrinter/testInput5.csv");
+    int b2 = quantityOfCols(data2);
+    if (b2 != 0) {
+        freeArrInArr(data2, a2);
+        return false;
+    }
+    freeArrInArr(data2, a2);
+    freeArrInArr(data1, a1);
+    printf("завершена успешно\n");
+    return true;
+}
+
+bool testOneElement(void)
+{ // проверим то что запишется в файл прям поэлементно
+    return true;
+}
+
+bool testCheckMaxLenght(void)
 {
     return true;
 }
 
-bool testColumsQuantity()
+int tests()
 {
-    return true;
+
+    if (!testRowsQuantity()) {
+        printf("с ошибкой в подстчете кол-ва строк");
+        return 1;
+    }
+
+    if (!testColumsQuantity()) {
+        printf("с ошибкой в подсчете кол-ва столбцов");
+        return 1;
+    }
+
+    /*
+    if (!testOneElement()) {
+        printf("g");
+        return 1;
+    }*/
+
+    printf("Все тесты пройдены успешно!\n");
+    return 0;
 }
 
-bool testOneElement()
+int main(int argc, char* argv[])
 {
-    return true;
-}
-
-bool testCheckMaxLenght()
-{
-    return true;
-}
-
-bool tests()
-{
-    printf("Все тесты пройдены успешно!");
-    return true;
-}
-*/
-int main(void)
-{
-    algorithm();
+    if (argc > 1 && strcmp(argv[1], "--test") == 0) {
+        printf("Запуск тестов...\n");
+        tests();
+        return 0;
+    }
+    // пример работы (из условия задачи)
+    algorithm("src/CSVprettyPrinter/testInput2.csv", "src/CSVprettyPrinter/output.txt");
     return 0;
 }
