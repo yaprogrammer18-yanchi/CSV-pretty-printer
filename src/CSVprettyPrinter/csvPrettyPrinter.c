@@ -369,29 +369,27 @@ bool testSimpleOccasion(void)
     return true;
 }
 
-int tests(void)
+void tests(void)
 {
     if (!testRowsQuantity()) {
         printf("с ошибкой в подстчете кол-ва строк\n");
-        return 1;
+        return;
     }
-
     if (!testColumsQuantity()) {
         printf("с ошибкой  в подсчете кол-ва столбцов\n");
-        return 1;
+        return;
     }
     if (!testSimpleOccasion()) {
         printf("с ошибкой  в тестировании простого случая\n");
-        return 1;
+        return;
     }
 
     if (!testCheckMaxLenght()) {
         printf("с ошибкой в тестировании полученных максимальных длин столбцов\n");
-        return 1;
+        return;
     }
 
     printf("Все тесты пройдены успешно!\n");
-    return 0;
 }
 
 int main(int argc, char* argv[])
