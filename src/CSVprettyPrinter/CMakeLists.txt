@@ -1,0 +1,2 @@
+add_executable(csvPrettyPrinter csvPrettyPrinter.c)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

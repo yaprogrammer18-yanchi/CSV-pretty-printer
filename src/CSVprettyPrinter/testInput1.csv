@@ -1,0 +1,6 @@
+Product,Price,Quantity,InStock,Rating
+Laptop,999.99,50,true,4.5
+Mouse,25.50,200,false,4.0
+Keyboard,75.00,150,true,4.2
+Monitor,299.99,30,true,4.7
+USB Cable,12.99,500,false,3.8
